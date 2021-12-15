@@ -1,4 +1,3 @@
-const { create } = require("domain");
 const fs = require("fs/promises");
 const { data } = require("./read-write-data");
 
