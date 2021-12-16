@@ -9,7 +9,7 @@ function requestHandler(req, res) {
   console.log(req);
 
   res.writeHead(200, { "Content-Type": "text/plain" });
-  res.write("hello world!");
+  res.write("i love cheeseburgers!");
   res.end();
 }
 

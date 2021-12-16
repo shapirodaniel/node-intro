@@ -20,10 +20,15 @@ app.get("/api", (req, res) => {
 });
 
 app.get("/api/admin", (req, res) => {
-  const { user } = req.query;
+  const { user } = req.query || {};
+
+  if (!user) {
+    return res.status(401).send("401 unauthorized");
+  }
+
   const { id } = JSON.parse(user);
 
-  if (!user || !admins[id]) {
+  if (!id || !admins[id]) {
     return res.status(401).send("401 unauthorized");
   }
 
