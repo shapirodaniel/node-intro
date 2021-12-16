@@ -4,9 +4,12 @@ const PORT = 8080;
 const bodyParser = require("body-parser");
 const jsonParser = bodyParser.json();
 const { v4: uuidv4 } = require("uuid");
+const cors = require("cors");
 
 const admins = { abc: "123" };
-const leaderboard = {};
+let leaderboard = [];
+
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.status(200).send("nothing here!");
@@ -28,7 +31,8 @@ app.get("/api/admin", (req, res) => {
 });
 
 app.get("/api/leaderboard", (req, res) => {
-  res.status(200).send(leaderboard);
+  leaderboard = leaderboard.slice(0, 3);
+  res.status(200).send({ leaderboard });
 });
 
 app.get("/api/leaderboard/:id", (req, res) => {
@@ -40,7 +44,13 @@ app.get("/api/leaderboard/:id", (req, res) => {
 app.post("/api/newscore", jsonParser, (req, res) => {
   const id = uuidv4();
   const entry = { ...req.body, id, createdAt: Date.now() };
-  leaderboard[id] = entry;
+  leaderboard.push(entry);
+
+  // this is a super lazy way of making sure new entries end up in top score order
+  // we can do this because we're only ever going to retain a finite number of scores
+  // so we'll never be forced to sort a large dataset
+  leaderboard.sort((a, b) => (+a.score > +b.score ? -1 : 1));
+
   res.status(201).send(entry);
 });
 
