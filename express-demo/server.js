@@ -20,23 +20,20 @@ app.get("/api", (req, res) => {
 });
 
 app.get("/api/admin", (req, res) => {
-  const { user } = req.query || {};
+  if (req.query.user) {
+    const { id } = JSON.parse(req.query.user) || {};
 
-  if (!user) {
-    return res.status(401).send("401 unauthorized");
+    if (id && admins[id]) {
+      res.send("Admin access granted");
+    } else {
+      res.status(401).send("401 unauthorized");
+    }
+  } else {
+    res.status(401).send("401 unauthorized");
   }
-
-  const { id } = JSON.parse(user);
-
-  if (!id || !admins[id]) {
-    return res.status(401).send("401 unauthorized");
-  }
-
-  res.send("Admin access granted");
 });
 
 app.get("/api/leaderboard", (req, res) => {
-  leaderboard = leaderboard.slice(0, 3);
   res.status(200).send({ leaderboard });
 });
 
@@ -55,7 +52,7 @@ app.post("/api/newscore", jsonParser, (req, res) => {
   // we can do this because we're only ever going to retain a finite number of scores
   // so we'll never be forced to sort a large dataset
   leaderboard.sort((a, b) => (+a.score > +b.score ? -1 : 1));
-
+  leaderboard = leaderboard.slice(0, 3);
   res.status(201).send(entry);
 });
 
